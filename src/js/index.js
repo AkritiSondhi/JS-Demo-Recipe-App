@@ -32,3 +32,13 @@ elements.searchForm.addEventListener("submit", (event) => {
   event.preventDefault();
   controlSearch();
 });
+
+elements.searchResPages.addEventListener("click", (event) => {
+  const button = event.target.closest(".btn-inline");
+
+  if (button) {
+    const goToPage = parseInt(button.dataset.goto, 10);
+    searchView.clearResults();
+    searchView.rederResults(state.search.recipes, goToPage);
+  }
+});
