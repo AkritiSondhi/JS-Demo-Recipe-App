@@ -1,4 +1,5 @@
 import Search from "./model/Serach";
+import Recipe from "./model/Recipe";
 import { elements, renderLoader, clearLoader } from "./view/base";
 import * as searchView from "./view/searchView";
 
@@ -21,10 +22,14 @@ const controlSearch = async () => {
     searchView.clearResults();
     renderLoader(elements.searchResultList);
 
-    await state.search.getRecipes();
-
-    clearLoader();
-    searchView.rederResults(state.search.recipes);
+    try {
+      await state.search.getRecipes();
+      clearLoader();
+      searchView.rederResults(state.search.recipes);
+    } catch (error) {
+      clearLoader();
+      alert(error);
+    }
   }
 };
 
@@ -42,3 +47,20 @@ elements.searchResPages.addEventListener("click", (event) => {
     searchView.rederResults(state.search.recipes, goToPage);
   }
 });
+
+const updateRecipe = () => {
+  const id = window.location.hash.replace("#", "");
+  if (id) {
+    state.recipe = new Recipe(id);
+
+    try {
+      await state.recipe.getRecipe();
+      state.recipe.calculateServings();
+      state.recipe.calculateTime();
+    } catch (error) {
+      alert(error);
+    }
+  }
+};
+
+['hashchange', 'load'].forEach(event => window.addEventListener(event, updateRecipe));
