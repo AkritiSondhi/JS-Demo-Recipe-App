@@ -48,13 +48,14 @@ elements.searchResPages.addEventListener("click", (event) => {
   }
 });
 
-const updateRecipe = () => {
+const updateRecipe = async () => {
   const id = window.location.hash.replace("#", "");
   if (id) {
     state.recipe = new Recipe(id);
 
     try {
       await state.recipe.getRecipe();
+      state.recipe.parseIngredients();
       state.recipe.calculateServings();
       state.recipe.calculateTime();
     } catch (error) {
@@ -63,4 +64,6 @@ const updateRecipe = () => {
   }
 };
 
-['hashchange', 'load'].forEach(event => window.addEventListener(event, updateRecipe));
+["hashchange", "load"].forEach((event) =>
+  window.addEventListener(event, updateRecipe)
+);

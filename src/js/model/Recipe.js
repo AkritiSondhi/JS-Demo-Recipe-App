@@ -29,4 +29,76 @@ export default class Recipe {
   calculateServings() {
     this.servings = 4;
   }
+
+  parseIngredients() {
+    const unitsLong = [
+      "tablespoons",
+      "tablespoon",
+      "ounces",
+      "ounce",
+      "teaspoons",
+      "teaspoon",
+      "cups",
+      "pounds",
+    ];
+    const unitsShort = [
+      "tbsp",
+      "tbsp",
+      "oz",
+      "oz",
+      "tsp",
+      "tsp",
+      "cup",
+      "pound",
+    ];
+
+    const newIngredients = this.ingredients.map((element) => {
+      let ingredient = element.toLowerCase();
+      unitsLong.forEach((current, index) => {
+        ingredient = ingredient.replace(current, unitsShort[current]);
+      });
+
+      ingredient.replace(/ *\([^)]*\) */g, " ");
+
+      const arrIngredientParts = ingredient.split(" ");
+      const unitIndex = arrIngredientParts.findIndex((ingredientElement) => {
+        unitsShort.includes(ingredientElement);
+      });
+
+      let objectIngredient;
+      if (unitIndex > -1) {
+        let count;
+        const arrCount = arrIngredientParts.slice(0, unitIndex);
+
+        if (arrCount.length === 1) {
+          count = arrCount[0].replace("-", "+");
+        } else {
+          count = eval(
+            arrCount.slice(0, unitIndex).join("+").replace("-", "+")
+          );
+        }
+
+        objectIngredient = {
+          count,
+          unit: arrIngredientParts[unitIndex],
+          ingredient: arrIngredientParts.slice(unitIndex + 1).join(" "),
+        };
+      } else if (parseInt(arrIngredientParts[0], 10)) {
+        objectIngredient = {
+          count: parseInt(arrIngredientParts[0], 10),
+          unit: "",
+          ingredient: arrIngredientParts.slice(1).join(" "),
+        };
+      } else if (unitIndex === -1) {
+        objectIngredient = {
+          count: 1,
+          unit: "",
+          ingredient,
+        };
+      }
+
+      return ingredient;
+    });
+    this.ingredients = newIngredients;
+  }
 }
