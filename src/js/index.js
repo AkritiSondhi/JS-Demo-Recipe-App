@@ -2,6 +2,7 @@ import Search from "./model/Serach";
 import Recipe from "./model/Recipe";
 import { elements, renderLoader, clearLoader } from "./view/base";
 import * as searchView from "./view/searchView";
+import * as recipeView from "./view/recipeView";
 
 /**
  * Gloabl State of the app.
@@ -49,8 +50,10 @@ elements.searchResPages.addEventListener("click", (event) => {
 });
 
 const updateRecipe = async () => {
+  recipeView.clearRecipe();
   const id = window.location.hash.replace("#", "");
   if (id) {
+    renderLoader(elements.recipe);
     state.recipe = new Recipe(id);
 
     try {
@@ -58,6 +61,9 @@ const updateRecipe = async () => {
       state.recipe.parseIngredients();
       state.recipe.calculateServings();
       state.recipe.calculateTime();
+
+      clearLoader();
+      recipeView.renderRecipe(state.recipe);
     } catch (error) {
       alert(error);
     }

@@ -10,6 +10,7 @@ export default class Recipe {
       const res = await axios(
         `https://forkify-api.herokuapp.com/api/get?rId=${this.id}`
       );
+
       this.title = res.data.recipe.title;
       this.author = res.data.recipe.publisher;
       this.img = res.data.recipe.image_url;
@@ -23,7 +24,7 @@ export default class Recipe {
   calculateTime() {
     const ingredientsCount = this.ingredients.length;
     const periods = Math.ceil(ingredientsCount / 3);
-    this.title = periods * 15;
+    this.time = periods * 15;
   }
 
   calculateServings() {
@@ -51,19 +52,20 @@ export default class Recipe {
       "cup",
       "pound",
     ];
+    const units = [...unitsShort, "kg", "g"];
 
     const newIngredients = this.ingredients.map((element) => {
       let ingredient = element.toLowerCase();
       unitsLong.forEach((current, index) => {
-        ingredient = ingredient.replace(current, unitsShort[current]);
+        ingredient = ingredient.replace(current, unitsShort[index]);
       });
 
-      ingredient.replace(/ *\([^)]*\) */g, " ");
+      ingredient = ingredient.replace(/ *\([^)]*\) */g, " ");
 
       const arrIngredientParts = ingredient.split(" ");
-      const unitIndex = arrIngredientParts.findIndex((ingredientElement) => {
-        unitsShort.includes(ingredientElement);
-      });
+      const unitIndex = arrIngredientParts.findIndex((ingredientElement) =>
+        units.includes(ingredientElement)
+      );
 
       let objectIngredient;
       if (unitIndex > -1) {
@@ -71,11 +73,9 @@ export default class Recipe {
         const arrCount = arrIngredientParts.slice(0, unitIndex);
 
         if (arrCount.length === 1) {
-          count = arrCount[0].replace("-", "+");
+          count = eval(arrCount[0].replace("-", "+"));
         } else {
-          count = eval(
-            arrCount.slice(0, unitIndex).join("+").replace("-", "+")
-          );
+          count = eval(arrCount.slice(0, unitIndex).join("+"));
         }
 
         objectIngredient = {
@@ -97,7 +97,7 @@ export default class Recipe {
         };
       }
 
-      return ingredient;
+      return objectIngredient;
     });
     this.ingredients = newIngredients;
   }
