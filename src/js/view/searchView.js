@@ -84,3 +84,14 @@ export const rederResults = (recipes, page = 1, resultsPerPage = 10) => {
 
   renderButtons(page, recipes.length, resultsPerPage);
 };
+
+export const highlightSelected = (id) => {
+  const resultsList = Array.from(document.querySelectorAll(".results__link"));
+  resultsList.forEach((element) => {
+    element.classList.remove("results__link--active");
+  });
+
+  document
+    .querySelector(`a[href="#${id}"]`)
+    .classList.add("results__link--active");
+};

@@ -54,6 +54,9 @@ const updateRecipe = async () => {
   const id = window.location.hash.replace("#", "");
   if (id) {
     renderLoader(elements.recipe);
+    if (state.search) {
+      searchView.highlightSelected(id);
+    }
     state.recipe = new Recipe(id);
 
     try {
