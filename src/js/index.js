@@ -1,8 +1,10 @@
 import Search from "./model/Serach";
 import Recipe from "./model/Recipe";
+import List from "./model/List";
 import { elements, renderLoader, clearLoader } from "./view/base";
 import * as searchView from "./view/searchView";
 import * as recipeView from "./view/recipeView";
+import * as listView from "./view/listView";
 
 /**
  * Gloabl State of the app.
@@ -73,7 +75,31 @@ const updateRecipe = async () => {
   }
 };
 
-["hashchange", "load"].forEach((event) =>
+const updateShoppingList = () => {
+  if (!state.list) {
+    state.list = new List();
+  }
+
+  state.recipe.ingredients.forEach((current) => {
+    const addedItem = state.list.addItem(
+      current.count,
+      current.unit,
+      current.ingredient
+    );
+    listView.renderItem(addedItem);
+  });
+};
+
+elements.shoppingList.addEventListener("click", (element) => {
+  const id = element.target.closest(".shopping__item").dataset.itemid;
+
+  if (element.target.matches(".shopping__delete, .shopping__delete *")) {
+    state.list.deleteItem(id);
+    listView.deleteItem(id);
+  }
+});
+
+[("hashchange", "load")].forEach((event) =>
   window.addEventListener(event, updateRecipe)
 );
 
@@ -86,5 +112,7 @@ elements.recipe.addEventListener("click", (event) => {
   } else if (event.target.matches(".btn-increase, .btn-increase *")) {
     state.recipe.updateServings("inc");
     recipeView.updateServingsIngredients(state.recipe);
+  } else if (event.target.matches(".recipe__btn--add, .recipe__btn--add *")) {
+    updateShoppingList();
   }
 });
