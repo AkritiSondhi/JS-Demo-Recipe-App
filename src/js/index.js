@@ -114,5 +114,8 @@ elements.recipe.addEventListener("click", (event) => {
     recipeView.updateServingsIngredients(state.recipe);
   } else if (event.target.matches(".recipe__btn--add, .recipe__btn--add *")) {
     updateShoppingList();
+  } else if (event.target.matches(".shopping__count-value")) {
+    const value = parseFloat(event.target.value, 10);
+    state.list.updateCount(id, value);
   }
 });
