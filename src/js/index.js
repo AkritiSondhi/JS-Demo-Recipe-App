@@ -1,10 +1,12 @@
 import Search from "./model/Serach";
 import Recipe from "./model/Recipe";
 import List from "./model/List";
+import Likes from "./model/Likes";
 import { elements, renderLoader, clearLoader } from "./view/base";
 import * as searchView from "./view/searchView";
 import * as recipeView from "./view/recipeView";
 import * as listView from "./view/listView";
+import * as likesView from "./view/likesView";
 
 /**
  * Gloabl State of the app.
@@ -52,9 +54,9 @@ elements.searchResPages.addEventListener("click", (event) => {
 });
 
 const updateRecipe = async () => {
-  recipeView.clearRecipe();
   const id = window.location.hash.replace("#", "");
   if (id) {
+    recipeView.clearRecipe();
     renderLoader(elements.recipe);
     if (state.search) {
       searchView.highlightSelected(id);
@@ -68,7 +70,7 @@ const updateRecipe = async () => {
       state.recipe.calculateTime();
 
       clearLoader();
-      recipeView.renderRecipe(state.recipe);
+      recipeView.renderRecipe(state.recipe, state.likes.isLiked(id));
     } catch (error) {
       alert(error);
     }
@@ -90,6 +92,30 @@ const updateShoppingList = () => {
   });
 };
 
+const updateLikes = () => {
+  if (!state.likes) {
+    state.likes = new Likes();
+  }
+
+  const currentId = state.recipe.id;
+
+  if (!state.likes.isLiked(currentId)) {
+    const newLike = state.likes.addLikedRecipe(
+      currentId,
+      state.recipe.title,
+      state.recipe.author,
+      state.recipe.img
+    );
+    likesView.toggleLikeButton(true);
+    likesView.renderLike(newLike);
+  } else {
+    state.likes.removeLikedRecipe(currentId);
+    likesView.toggleLikeButton(false);
+    likesView.deleteLike(currentId);
+  }
+  likesView.toggleLikeMenu(state.likes.getLikesCount());
+};
+
 elements.shoppingList.addEventListener("click", (element) => {
   const id = element.target.closest(".shopping__item").dataset.itemid;
 
@@ -99,7 +125,7 @@ elements.shoppingList.addEventListener("click", (element) => {
   }
 });
 
-[("hashchange", "load")].forEach((event) =>
+["hashchange", "load"].forEach((event) =>
   window.addEventListener(event, updateRecipe)
 );
 
@@ -117,5 +143,16 @@ elements.recipe.addEventListener("click", (event) => {
   } else if (event.target.matches(".shopping__count-value")) {
     const value = parseFloat(event.target.value, 10);
     state.list.updateCount(id, value);
+  } else if (event.target.matches(".recipe__love, .recipe__love *")) {
+    updateLikes();
   }
+});
+
+window.addEventListener("load", () => {
+  state.likes = new Likes();
+  state.likes.readStorage();
+  likesView.toggleLikeMenu(state.likes.getLikesCount());
+  state.likes.likes.forEach((like) => {
+    likesView.renderLike(like);
+  });
 });

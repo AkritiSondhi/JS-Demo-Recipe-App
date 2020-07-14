@@ -11,7 +11,7 @@ export const clearResults = () => {
   elements.searchResPages.innerHTML = "";
 };
 
-const limitRecipeTitle = (recipeTitle, limit = 17) => {
+export const limitRecipeTitle = (recipeTitle, limit = 17) => {
   if (recipeTitle.length > limit) {
     const newTitle = new Array();
     recipeTitle.split(" ").reduce((accumulator, current) => {
@@ -92,6 +92,6 @@ export const highlightSelected = (id) => {
   });
 
   document
-    .querySelector(`a[href="#${id}"]`)
+    .querySelector(`.results__link[href="#${id}"]`)
     .classList.add("results__link--active");
 };
