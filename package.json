@@ -4,7 +4,7 @@
   "description": "Demo app to learn JS",
   "main": "index.js",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "uniqid": "^5.2.0"
   },
